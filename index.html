@@ -6,6 +6,7 @@
     <title>"Progress Documentation"</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         .grid-background {
             background-image: 
@@ -30,18 +31,27 @@
             <div class="text-pink-700 text-sm mt-2 space-y-2">
                 <p>1. Add progress screenshots using the upload button below</p>
                 <p>2. Write your notes in the space provided</p>
-                <p>3. Take a final screenshot of this entire practice space:</p>
-                <ul class="ml-4 space-y-1">
-                    <li>• Mac: Press Command (⌘) + Shift + 3 for full screen</li>
-                    <li>• Windows: Press Windows + Shift + S</li>
-                </ul>
-                <p>4. Upload your final screenshot to Padlet</p>
+                <p>3. Click "Download Progress Report" to save your work as a PDF</p>
+                <p>4. Upload your PDF to Padlet</p>
             </div>
         </div>
 
         <h3 class="text-3xl font-bold text-teal-600 mb-8 text-center">
             Practice Space - Task 1
         </h3>
+
+        <!-- Student Name Input -->
+        <div class="mb-6">
+            <label class="block text-teal-800 mb-2 font-bold">
+                Your Name:
+            </label>
+            <input
+                type="text"
+                id="student-name"
+                class="w-full p-3 border-2 border-teal-200 rounded-lg bg-white/50 backdrop-blur-sm focus:border-teal-400 focus:ring-1 focus:ring-teal-400 outline-none"
+                placeholder="Enter your name..."
+            />
+        </div>
 
         <!-- Progress Screenshot Upload Section -->
         <div class="mb-6">
@@ -80,7 +90,7 @@
             <textarea
                 id="notes"
                 class="w-full p-3 border-2 border-teal-200 rounded-lg h-48 bg-white/50 backdrop-blur-sm focus:border-teal-400 focus:ring-1 focus:ring-teal-400 outline-none"
-                placeholder="Write your observations, challenges, and solutions here. This will be included in your screenshot for Padlet..."
+                placeholder="Write your observations, challenges, and solutions here..."
             ></textarea>
         </div>
 
@@ -96,21 +106,44 @@
             </ul>
         </div>
 
+        <!-- Download PDF Button -->
+        <div class="mb-6">
+            <button
+                onclick="generatePDF()"
+                class="w-full bg-teal-500 text-white px-6 py-4 rounded-lg hover:bg-teal-600 inline-flex items-center justify-center gap-2 transition-colors font-bold text-lg"
+            >
+                <i data-lucide="download" class="w-6 h-6"></i>
+                Download Progress Report (PDF)
+            </button>
+        </div>
+
         <!-- Padlet Reminder -->
         <div class="mt-6 text-center p-4 bg-teal-50/80 backdrop-blur-sm rounded-lg border-2 border-teal-100">
             <div class="flex items-center justify-center gap-2 text-teal-800 font-bold">
                 <i data-lucide="external-link" class="w-5 h-5"></i>
-                Remember to upload your final screenshot to Padlet!
+                Remember to upload your PDF to Padlet!
             </div>
             <p class="text-sm text-teal-600 mt-2">
-                Your screenshot should include your progress images, notes, and these prompts for context
+                Your PDF will include all your progress images and notes
             </p>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl text-center">
+            <div class="animate-spin w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p class="text-teal-800 font-bold">Generating your PDF...</p>
+            <p class="text-teal-600 text-sm">This may take a moment</p>
         </div>
     </div>
 
     <script>
         // Initialize Lucide icons
         lucide.createIcons();
+
+        // Store uploaded images
+        let uploadedImages = [];
 
         // Handle file upload
         document.getElementById('screenshot-upload').addEventListener('change', function(e) {
@@ -123,11 +156,15 @@
                     
                     container.classList.remove('hidden');
                     
+                    const imageIndex = uploadedImages.length;
+                    uploadedImages.push(e.target.result);
+                    
                     const wrapper = document.createElement('div');
                     wrapper.className = 'relative group';
+                    wrapper.setAttribute('data-index', imageIndex);
                     wrapper.innerHTML = `
                         <img src="${e.target.result}" alt="Practice progress" class="rounded-lg w-full object-cover aspect-video border-2 border-teal-200">
-                        <button onclick="this.parentElement.remove()" class="absolute top-2 right-2 bg-pink-400 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-pink-500">
+                        <button onclick="removeImage(this, ${imageIndex})" class="absolute top-2 right-2 bg-pink-400 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-pink-500">
                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                         </button>
                     `;
@@ -137,7 +174,266 @@
                 };
                 reader.readAsDataURL(file);
             }
+            // Reset input to allow same file to be uploaded again
+            this.value = '';
         });
+
+        // Remove image function
+        function removeImage(button, index) {
+            uploadedImages[index] = null;
+            button.parentElement.remove();
+            
+            // Hide container if no images left
+            const remainingImages = uploadedImages.filter(img => img !== null);
+            if (remainingImages.length === 0) {
+                document.getElementById('screenshots-container').classList.add('hidden');
+            }
+        }
+
+        // Generate PDF function
+        async function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            
+            // Show loading overlay
+            document.getElementById('loading-overlay').classList.remove('hidden');
+            
+            try {
+                // Get form data
+                const studentName = document.getElementById('student-name').value || 'Student';
+                const notes = document.getElementById('notes').value || 'No notes provided';
+                const activeImages = uploadedImages.filter(img => img !== null);
+                
+                // Create PDF (A4 size)
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const margin = 15;
+                const contentWidth = pageWidth - (margin * 2);
+                let yPosition = margin;
+                
+                // Helper function to add new page if needed
+                function checkNewPage(requiredHeight) {
+                    if (yPosition + requiredHeight > pageHeight - margin) {
+                        pdf.addPage();
+                        yPosition = margin;
+                        return true;
+                    }
+                    return false;
+                }
+                
+                // Helper function to wrap text
+                function addWrappedText(text, x, y, maxWidth, lineHeight) {
+                    const lines = pdf.splitTextToSize(text, maxWidth);
+                    lines.forEach((line, index) => {
+                        checkNewPage(lineHeight);
+                        pdf.text(line, x, yPosition);
+                        yPosition += lineHeight;
+                    });
+                    return lines.length * lineHeight;
+                }
+                
+                // Header with teal color
+                pdf.setFillColor(32, 178, 170);
+                pdf.rect(0, 0, pageWidth, 35, 'F');
+                
+                // Title
+                pdf.setTextColor(255, 255, 255);
+                pdf.setFontSize(24);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Progress Report', pageWidth / 2, 18, { align: 'center' });
+                
+                // Subtitle
+                pdf.setFontSize(12);
+                pdf.setFont('helvetica', 'normal');
+                pdf.text('Practice Space - Task 1', pageWidth / 2, 28, { align: 'center' });
+                
+                yPosition = 45;
+                
+                // Student info box
+                pdf.setFillColor(240, 253, 250);
+                pdf.setDrawColor(32, 178, 170);
+                pdf.roundedRect(margin, yPosition, contentWidth, 20, 3, 3, 'FD');
+                
+                pdf.setTextColor(32, 178, 170);
+                pdf.setFontSize(11);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Student:', margin + 5, yPosition + 8);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(60, 60, 60);
+                pdf.text(studentName, margin + 28, yPosition + 8);
+                
+                pdf.setTextColor(32, 178, 170);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Date:', margin + 5, yPosition + 16);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setTextColor(60, 60, 60);
+                pdf.text(new Date().toLocaleDateString('en-GB', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                }), margin + 20, yPosition + 16);
+                
+                yPosition += 30;
+                
+                // Progress Screenshots Section
+                if (activeImages.length > 0) {
+                    pdf.setTextColor(32, 178, 170);
+                    pdf.setFontSize(14);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('Progress Screenshots', margin, yPosition);
+                    yPosition += 8;
+                    
+                    // Add images - larger size, one per row for better visibility
+                    for (let i = 0; i < activeImages.length; i++) {
+                        const imgData = activeImages[i];
+                        
+                        // Calculate image dimensions to fit width while maintaining aspect ratio
+                        const img = new Image();
+                        img.src = imgData;
+                        
+                        await new Promise((resolve) => {
+                            img.onload = resolve;
+                        });
+                        
+                        const aspectRatio = img.width / img.height;
+                        let imgWidth = contentWidth;
+                        let imgHeight = imgWidth / aspectRatio;
+                        
+                        // Limit max height
+                        const maxHeight = 80;
+                        if (imgHeight > maxHeight) {
+                            imgHeight = maxHeight;
+                            imgWidth = imgHeight * aspectRatio;
+                        }
+                        
+                        // Check if we need a new page
+                        checkNewPage(imgHeight + 15);
+                        
+                        // Add image label
+                        pdf.setTextColor(100, 100, 100);
+                        pdf.setFontSize(10);
+                        pdf.setFont('helvetica', 'italic');
+                        pdf.text(`Screenshot ${i + 1}`, margin, yPosition);
+                        yPosition += 5;
+                        
+                        // Add border around image
+                        pdf.setDrawColor(32, 178, 170);
+                        pdf.setLineWidth(0.5);
+                        
+                        // Center the image
+                        const xOffset = (contentWidth - imgWidth) / 2;
+                        pdf.addImage(imgData, 'JPEG', margin + xOffset, yPosition, imgWidth, imgHeight);
+                        pdf.roundedRect(margin + xOffset - 1, yPosition - 1, imgWidth + 2, imgHeight + 2, 2, 2, 'S');
+                        
+                        yPosition += imgHeight + 10;
+                    }
+                    
+                    yPosition += 5;
+                }
+                
+                // Notes Section
+                checkNewPage(40);
+                
+                pdf.setTextColor(32, 178, 170);
+                pdf.setFontSize(14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Practice Notes', margin, yPosition);
+                yPosition += 8;
+                
+                // Notes box
+                pdf.setFillColor(255, 250, 250);
+                pdf.setDrawColor(255, 182, 193);
+                
+                // Calculate height needed for notes
+                pdf.setFontSize(11);
+                pdf.setFont('helvetica', 'normal');
+                const notesLines = pdf.splitTextToSize(notes, contentWidth - 10);
+                const notesHeight = Math.max(30, notesLines.length * 6 + 10);
+                
+                // Check if notes fit on current page
+                if (yPosition + notesHeight > pageHeight - margin) {
+                    pdf.addPage();
+                    yPosition = margin;
+                    
+                    // Re-add section header on new page
+                    pdf.setTextColor(32, 178, 170);
+                    pdf.setFontSize(14);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('Practice Notes (continued)', margin, yPosition);
+                    yPosition += 8;
+                }
+                
+                pdf.roundedRect(margin, yPosition, contentWidth, notesHeight, 3, 3, 'FD');
+                
+                pdf.setTextColor(60, 60, 60);
+                pdf.setFontSize(11);
+                pdf.setFont('helvetica', 'normal');
+                
+                let textY = yPosition + 7;
+                notesLines.forEach(line => {
+                    if (textY < yPosition + notesHeight - 3) {
+                        pdf.text(line, margin + 5, textY);
+                        textY += 6;
+                    }
+                });
+                
+                yPosition += notesHeight + 10;
+                
+                // Reflection Prompts Section
+                checkNewPage(50);
+                
+                pdf.setTextColor(32, 178, 170);
+                pdf.setFontSize(14);
+                pdf.setFont('helvetica', 'bold');
+                pdf.text('Reflection Prompts', margin, yPosition);
+                yPosition += 8;
+                
+                pdf.setFillColor(240, 253, 250);
+                pdf.setDrawColor(32, 178, 170);
+                pdf.roundedRect(margin, yPosition, contentWidth, 45, 3, 3, 'FD');
+                
+                const prompts = [
+                    '• What specific techniques did you practice?',
+                    '• What challenges did you encounter?',
+                    '• How did you overcome these challenges?',
+                    '• What worked well and what didn\'t?',
+                    '• What will you try differently next time?'
+                ];
+                
+                pdf.setTextColor(80, 80, 80);
+                pdf.setFontSize(10);
+                pdf.setFont('helvetica', 'normal');
+                
+                let promptY = yPosition + 8;
+                prompts.forEach(prompt => {
+                    pdf.text(prompt, margin + 5, promptY);
+                    promptY += 8;
+                });
+                
+                // Footer
+                const totalPages = pdf.internal.getNumberOfPages();
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+                    pdf.setFillColor(32, 178, 170);
+                    pdf.rect(0, pageHeight - 12, pageWidth, 12, 'F');
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFontSize(9);
+                    pdf.text(`Page ${i} of ${totalPages}`, pageWidth / 2, pageHeight - 4, { align: 'center' });
+                }
+                
+                // Save the PDF
+                const fileName = `Progress_Report_${studentName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+                pdf.save(fileName);
+                
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('There was an error generating your PDF. Please try again.');
+            } finally {
+                // Hide loading overlay
+                document.getElementById('loading-overlay').classList.add('hidden');
+            }
+        }
     </script>
 </body>
 </html>
