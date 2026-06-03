@@ -1,676 +1,840 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Progress Documentation</title>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
-        :root {
-            --primary: #c45c4a;
-            --primary-dark: #a84a3a;
-            --secondary: #8a7a9c;
-            --tertiary: #7ecbc4;
-            --tertiary-dark: #5a9a94;
-            --background: #f5f5dc;
-            --text-dark: #4a3a36;
-        }
-        
-        .grid-background {
-            background-color: var(--background);
-            background-image: 
-                linear-gradient(var(--tertiary) 1px, transparent 1px),
-                linear-gradient(90deg, var(--tertiary) 1px, transparent 1px),
-                linear-gradient(var(--secondary) 1px, transparent 1px),
-                linear-gradient(90deg, var(--secondary) 1px, transparent 1px);
-            background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-        }
-        
-        .btn-tertiary {
-            background-color: var(--tertiary-dark);
-        }
-        
-        .btn-tertiary:hover {
-            background-color: #4a8a84;
-        }
-        
-        .border-primary {
-            border-color: var(--primary);
-        }
-        
-        .border-tertiary {
-            border-color: var(--tertiary);
-        }
-        
-        .border-secondary {
-            border-color: var(--secondary);
-        }
-        
-        .text-primary {
-            color: var(--primary);
-        }
-        
-        .text-tertiary {
-            color: var(--tertiary-dark);
-        }
-        
-        .text-dark {
-            color: var(--text-dark);
-        }
-        
-        .bg-cream {
-            background-color: var(--background);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Progress Documentation</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500&display=swap');
+
+:root {
+  --ink: #1a1a1a;
+  --paper: #f2ede8;
+  --teal: #0a7a7a;
+  --teal-light: #e0f0f0;
+  --pink: #ea37a3;
+  --pink-light: #fdf1f5;
+  --purple: #6c35c9;
+  --purple-light: #f3eeff;
+  --gold: #c87900;
+  --gold-light: #fff8e6;
+  --warm-mid: #d4cfc8;
+  --grid: #ddd8d2;
+  --concrete: #8a8a8a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'IBM Plex Mono', monospace;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: -10%; left: 48%;
+  width: 4px; height: 120vh;
+  background: rgba(255,255,255,0.6);
+  transform: rotate(12deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 36px 28px 60px;
+  position: relative;
+  z-index: 1;
+}
+
+/* HEADER */
+.site-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 16px;
+  border-bottom: 3px solid var(--ink);
+  padding-bottom: 18px;
+  margin-bottom: 24px;
+}
+.header-eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 6px;
+}
+.site-header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 400;
+  line-height: 1.1;
+}
+.site-header h1 em { color: var(--teal); font-style: italic; }
+.header-meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  text-align: right;
+  color: var(--concrete);
+  line-height: 1.8;
+}
+
+/* NOTICE */
+.notice {
+  background: rgba(234,55,163,0.08);
+  border-left: 4px solid var(--pink);
+  padding: 10px 14px;
+  margin-bottom: 20px;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.84rem;
+}
+.notice strong { color: var(--pink); }
+
+/* INFO BOX */
+.info-box {
+  border-left: 4px solid var(--teal);
+  background: var(--teal-light);
+  padding: 10px 14px;
+  border-radius: 0 4px 4px 0;
+  margin: 16px 0;
+  font-size: 0.86rem;
+}
+.info-box strong { color: var(--teal); }
+
+/* DIAGONAL RULE */
+.diagonal-rule {
+  height: 3px;
+  background: linear-gradient(90deg, var(--pink), var(--teal));
+  margin: 24px 0;
+  transform: skewX(-15deg);
+}
+
+/* FORM SECTIONS */
+.form-section {
+  background: white;
+  border: 2px solid var(--warm-mid);
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.form-section-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--teal);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.form-section-title .num {
+  width: 22px; height: 22px;
+  background: var(--teal);
+  color: white;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  display: block;
+  margin-bottom: 6px;
+}
+
+input[type="text"],
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid var(--warm-mid);
+  border-radius: 3px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.86rem;
+  background: white;
+  transition: border-color 0.2s;
+  color: var(--ink);
+}
+input[type="text"]:focus,
+textarea:focus { border-color: var(--teal); outline: none; }
+textarea { resize: vertical; min-height: 72px; }
+
+/* CONFIDENCE */
+.confidence-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 6px;
+}
+@media (min-width: 500px) { .confidence-grid { grid-template-columns: repeat(4, 1fr); } }
+
+.confidence-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border: 2px solid var(--warm-mid);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+}
+.confidence-option:hover { border-color: var(--teal); background: var(--teal-light); }
+.confidence-option input { accent-color: var(--teal); width: 16px; height: 16px; flex-shrink: 0; }
+.confidence-option span { font-family: 'Space Mono', monospace; font-size: 0.68rem; font-weight: 700; color: var(--ink); }
+
+/* IMAGE UPLOAD */
+.upload-zone {
+  border: 2px dashed var(--warm-mid);
+  border-radius: 3px;
+  padding: 16px;
+  text-align: center;
+  background: var(--paper);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 12px;
+}
+.upload-zone:hover { border-color: var(--teal); background: var(--teal-light); }
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--teal);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 3px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.upload-btn:hover { background: var(--ink); transform: translateY(-2px); }
+.upload-btn.pink { background: var(--pink); }
+.upload-btn.pink:hover { background: var(--ink); }
+
+/* IMAGE PREVIEWS */
+.image-preview-wrap {
+  display: none;
+  margin-top: 14px;
+}
+.image-preview-wrap.visible { display: block; }
+
+/* BEFORE/AFTER GRID */
+.before-after-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+@media (max-width: 560px) { .before-after-grid { grid-template-columns: 1fr; } }
+
+.img-upload-slot {
+  border: 2px solid var(--warm-mid);
+  border-radius: 3px;
+  overflow: hidden;
+  background: white;
+}
+.img-slot-header {
+  padding: 8px 12px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.img-slot-header.before { background: var(--teal-light); color: var(--teal); }
+.img-slot-header.after  { background: var(--pink-light); color: var(--pink); }
+
+.img-slot-body { padding: 10px; }
+.img-slot-body img {
+  width: 100%;
+  display: block;
+  border-radius: 2px;
+  margin-bottom: 8px;
+  border: 1px solid var(--warm-mid);
+  max-height: 300px;
+  object-fit: contain;
+  background: var(--paper);
+}
+.img-placeholder {
+  width: 100%;
+  height: 120px;
+  background: var(--paper);
+  border: 2px dashed var(--warm-mid);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--concrete);
+  text-align: center;
+  padding: 10px;
+}
+.img-placeholder:hover { border-color: var(--teal); background: var(--teal-light); color: var(--teal); }
+.img-placeholder.pink:hover { border-color: var(--pink); background: var(--pink-light); color: var(--pink); }
+
+/* ADDITIONAL IMAGES */
+.additional-images { margin-top: 12px; }
+.additional-img-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: start;
+  margin-bottom: 10px;
+  background: var(--paper);
+  border: 1px solid var(--warm-mid);
+  border-radius: 3px;
+  padding: 8px;
+}
+.additional-img-row img { width: 100%; border-radius: 2px; display: block; max-height: 200px; object-fit: contain; }
+.remove-btn {
+  background: none;
+  border: 2px solid var(--warm-mid);
+  border-radius: 3px;
+  padding: 4px 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--concrete);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.remove-btn:hover { border-color: var(--pink); color: var(--pink); }
+
+/* REFLECTION */
+.reflection-item {
+  margin-bottom: 14px;
+}
+.reflection-item label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.reflection-item label .q-num {
+  width: 20px; height: 20px;
+  background: var(--pink);
+  color: white;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* DOWNLOAD BUTTON */
+.download-btn {
+  width: 100%;
+  background: var(--ink);
+  color: white;
+  padding: 16px 32px;
+  border-radius: 3px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.download-btn:hover { background: var(--teal); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+
+/* PADLET REMINDER */
+.padlet-box {
+  background: white;
+  border: 3px dashed var(--gold);
+  border-radius: 4px;
+  padding: 20px;
+  text-align: center;
+  margin-top: 20px;
+}
+.padlet-box p { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--gold); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+.padlet-box span { font-size: 0.8rem; color: var(--concrete); }
+
+/* LOADING */
+#loading-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+#loading-overlay.visible { display: flex; }
+.loading-box {
+  background: white;
+  border: 3px solid var(--teal);
+  border-radius: 4px;
+  padding: 28px 36px;
+  text-align: center;
+}
+.loading-box p { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--teal); font-weight: 700; margin-top: 12px; }
+.spinner {
+  width: 40px; height: 40px;
+  border: 4px solid var(--teal-light);
+  border-top-color: var(--teal);
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+footer {
+  text-align: center;
+  padding: 20px 0 0;
+  border-top: 1px dashed var(--warm-mid);
+  margin-top: 32px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--concrete);
+}
+
+@media (max-width: 560px) {
+  .container { padding: 20px 14px 40px; }
+  .site-header { grid-template-columns: 1fr; }
+  .header-meta { text-align: left; }
+}
+</style>
 </head>
-<body class="min-h-screen p-6 font-mono grid-background">
-    <div class="max-w-3xl mx-auto bg-white/95 backdrop-blur-sm p-8 rounded-lg shadow-lg border-2 border-primary">
-        
-        <!-- Screenshot Instructions Banner -->
-        <div class="mb-6 bg-cream/80 backdrop-blur-sm p-4 rounded-lg border-2 border-secondary">
-            <h4 class="font-bold text-primary flex items-center gap-2">
-                <i data-lucide="camera" class="w-5 h-5"></i>
-                How to Document Your Practice
-            </h4>
-            <div class="text-dark text-sm mt-2 space-y-2">
-                <p>1. Enter your name below</p>
-                <p>2. Add progress screenshots using the upload button</p>
-                <p>3. Add captions to describe each screenshot</p>
-                <p>4. Rate your confidence and answer the reflection questions</p>
-                <p>5. Click "Download Progress Report" to save your work as a PDF</p>
-                <p>6. Upload your PDF to Padlet</p>
-            </div>
-        </div>
+<body>
 
-        <h3 class="text-3xl font-bold text-primary mb-8 text-center">
-            Practice Space - Task 1
-        </h3>
+<div id="loading-overlay">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <p>Generating your PDF…</p>
+  </div>
+</div>
 
-        <!-- Student Name Input -->
-        <div class="mb-6">
-            <label class="block text-dark mb-2 font-bold">
-                Your Name:
-            </label>
-            <input
-                type="text"
-                id="student-name"
-                class="w-full p-3 border-2 border-tertiary rounded-lg bg-white/50 backdrop-blur-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
-                placeholder="Enter your name..."
-            />
-        </div>
+<div class="container">
 
-        <!-- Progress Screenshot Upload Section -->
-        <div class="mb-6">
-            <label class="block text-dark mb-2 font-bold">
-                Add Progress Screenshots:
-            </label>
-            <div class="border-2 border-dashed border-tertiary rounded-lg p-4 text-center bg-white/50 backdrop-blur-sm">
-                <input
-                    type="file"
-                    id="screenshot-upload"
-                    class="hidden"
-                    accept="image/*"
-                />
-                <button
-                    onclick="document.getElementById('screenshot-upload').click()"
-                    class="btn-primary text-white px-4 py-2 rounded-lg inline-flex items-center gap-2 transition-colors"
-                >
-                    <i data-lucide="image" class="w-5 h-5"></i>
-                    Add Progress Screenshot
-                </button>
-                <p class="text-sm text-gray-500 mt-2">Click to upload images of your work</p>
-            </div>
-        </div>
+  <header class="site-header">
+    <div>
+      <div class="header-eyebrow">IELS Level 5 · Progress Documentation</div>
+      <h1>Document Your<br><em>Progress</em></h1>
+    </div>
+    <div class="header-meta">
+      Upload images<br>↓<br>Reflect<br>↓<br>Download PDF
+    </div>
+  </header>
 
-        <!-- Screenshots Display -->
-        <div id="screenshots-container" class="mb-6 hidden">
-            <h4 class="font-bold text-dark mb-3">Your Progress Screenshots:</h4>
-            <div id="screenshots-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            </div>
-        </div>
+  <div class="notice">
+    <strong>Use this after every session.</strong> Upload a before and after image, answer the four questions, and download your PDF to upload to Padlet.
+  </div>
 
-        <!-- Confidence Rating -->
-        <div class="mb-6">
-            <label class="block text-dark mb-2 font-bold">
-                Rate Your Confidence With This Skill:
-            </label>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                <label class="flex items-center gap-2 bg-white/50 px-3 py-3 rounded-lg border-2 border-tertiary cursor-pointer hover:border-primary transition-colors">
-                    <input type="radio" name="confidence" value="1" class="accent-primary w-4 h-4">
-                    <span class="text-sm text-dark">1 - Just starting</span>
-                </label>
-                <label class="flex items-center gap-2 bg-white/50 px-3 py-3 rounded-lg border-2 border-tertiary cursor-pointer hover:border-primary transition-colors">
-                    <input type="radio" name="confidence" value="2" class="accent-primary w-4 h-4">
-                    <span class="text-sm text-dark">2 - Getting there</span>
-                </label>
-                <label class="flex items-center gap-2 bg-white/50 px-3 py-3 rounded-lg border-2 border-tertiary cursor-pointer hover:border-primary transition-colors">
-                    <input type="radio" name="confidence" value="3" class="accent-primary w-4 h-4">
-                    <span class="text-sm text-dark">3 - Confident</span>
-                </label>
-                <label class="flex items-center gap-2 bg-white/50 px-3 py-3 rounded-lg border-2 border-tertiary cursor-pointer hover:border-primary transition-colors">
-                    <input type="radio" name="confidence" value="4" class="accent-primary w-4 h-4">
-                    <span class="text-sm text-dark">4 - Could teach others</span>
-                </label>
-            </div>
-        </div>
+  <!-- STEP 1 — NAME -->
+  <div class="form-section">
+    <div class="form-section-title"><span class="num">1</span> Your Name</div>
+    <label for="student-name">Full Name</label>
+    <input type="text" id="student-name" placeholder="First and last name">
+  </div>
 
-        <!-- Structured Reflection Questions -->
-        <div class="mb-6 space-y-4">
-            <h4 class="font-bold text-dark">Reflection Questions:</h4>
-            
-            <div class="bg-white/50 p-4 rounded-lg border-2 border-tertiary">
-                <label class="block text-dark mb-2 font-bold text-sm">
-                    <span class="text-primary">1.</span> What techniques did you practice?
-                </label>
-                <textarea
-                    id="notes-techniques"
-                    class="w-full p-3 border-2 border-secondary/50 rounded-lg h-24 bg-white/70 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm"
-                    placeholder="Describe the specific skills or techniques you worked on..."
-                ></textarea>
-            </div>
-            
-            <div class="bg-white/50 p-4 rounded-lg border-2 border-tertiary">
-                <label class="block text-dark mb-2 font-bold text-sm">
-                    <span class="text-primary">2.</span> What challenges did you face and how did you solve them?
-                </label>
-                <textarea
-                    id="notes-challenges"
-                    class="w-full p-3 border-2 border-secondary/50 rounded-lg h-24 bg-white/70 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm"
-                    placeholder="Describe any difficulties and your problem-solving approach..."
-                ></textarea>
-            </div>
-            
-            <div class="bg-white/50 p-4 rounded-lg border-2 border-tertiary">
-                <label class="block text-dark mb-2 font-bold text-sm">
-                    <span class="text-primary">3.</span> What worked well in your approach?
-                </label>
-                <textarea
-                    id="notes-worked"
-                    class="w-full p-3 border-2 border-secondary/50 rounded-lg h-24 bg-white/70 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm"
-                    placeholder="Reflect on what was successful..."
-                ></textarea>
-            </div>
-            
-            <div class="bg-white/50 p-4 rounded-lg border-2 border-tertiary">
-                <label class="block text-dark mb-2 font-bold text-sm">
-                    <span class="text-primary">4.</span> What will you do differently next time?
-                </label>
-                <textarea
-                    id="notes-next"
-                    class="w-full p-3 border-2 border-secondary/50 rounded-lg h-24 bg-white/70 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm"
-                    placeholder="Reflect on improvements for future practice..."
-                ></textarea>
-            </div>
-        </div>
-
-        <!-- Download PDF Button -->
-        <div class="mb-6">
-            <button
-                onclick="generatePDF()"
-                class="w-full btn-tertiary text-white px-6 py-4 rounded-lg inline-flex items-center justify-center gap-2 transition-colors font-bold text-lg"
-            >
-                <i data-lucide="download" class="w-6 h-6"></i>
-                Download Progress Report (PDF)
-            </button>
-        </div>
-
-        <!-- Padlet Reminder -->
-        <div class="mt-6 text-center p-4 bg-cream/80 backdrop-blur-sm rounded-lg border-2 border-secondary">
-            <div class="flex items-center justify-center gap-2 text-primary font-bold">
-                <i data-lucide="external-link" class="w-5 h-5"></i>
-                Remember to upload your PDF to Padlet!
-            </div>
-            <p class="text-sm text-dark mt-2">
-                Your PDF will include all your progress images, captions, and reflections
-            </p>
-        </div>
+  <!-- STEP 2 — BEFORE & AFTER -->
+  <div class="form-section">
+    <div class="form-section-title"><span class="num">2</span> Before &amp; After Images</div>
+    <div class="info-box" style="margin-bottom:14px;">
+      <strong>Show your progress.</strong> Upload a before image (earlier work or start of session) and an after image (your outcome today). This is the most important part of your documentation.
     </div>
 
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="fixed inset-0 bg-black/50 flex items-center justify-center hidden z-50">
-        <div class="bg-white p-6 rounded-lg shadow-xl text-center border-2 border-primary">
-            <div class="animate-spin w-12 h-12 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p class="text-dark font-bold">Generating your PDF...</p>
-            <p class="text-gray-500 text-sm">This may take a moment</p>
+    <div class="before-after-grid">
+
+      <div class="img-upload-slot">
+        <div class="img-slot-header before">⬅ Before</div>
+        <div class="img-slot-body">
+          <div class="img-placeholder" id="before-placeholder" onclick="document.getElementById('before-upload').click()">
+            Click to upload<br>your before image
+          </div>
+          <img id="before-preview" src="" alt="Before" style="display:none;">
+          <input type="file" id="before-upload" accept="image/*" style="display:none;" onchange="handleBeforeAfter('before', this)">
+          <label for="before-caption" style="margin-top:4px;">Caption</label>
+          <input type="text" id="before-caption" placeholder="Describe this image…">
         </div>
+      </div>
+
+      <div class="img-upload-slot">
+        <div class="img-slot-header after">After ➡</div>
+        <div class="img-slot-body">
+          <div class="img-placeholder pink" id="after-placeholder" onclick="document.getElementById('after-upload').click()">
+            Click to upload<br>your after image
+          </div>
+          <img id="after-preview" src="" alt="After" style="display:none;">
+          <input type="file" id="after-upload" accept="image/*" style="display:none;" onchange="handleBeforeAfter('after', this)">
+          <label for="after-caption" style="margin-top:4px;">Caption</label>
+          <input type="text" id="after-caption" placeholder="Describe this image…">
+        </div>
+      </div>
+
     </div>
 
-    <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
+    <!-- ADDITIONAL IMAGES -->
+    <div style="margin-top:16px;">
+      <div class="form-section-title" style="margin-bottom:8px;font-size:0.7rem;color:var(--concrete);">Additional Images (optional)</div>
+      <div class="upload-zone" onclick="document.getElementById('extra-upload').click()">
+        <button class="upload-btn" type="button">+ Add Another Image</button>
+        <p style="font-size:0.72rem;color:var(--concrete);margin-top:6px;font-family:'Space Mono',monospace;">Process shots, details, or experiments</p>
+      </div>
+      <input type="file" id="extra-upload" accept="image/*" style="display:none;" onchange="handleExtra(this)" multiple>
+      <div id="extra-images" class="additional-images"></div>
+    </div>
+  </div>
 
-        // Store uploaded images and captions
-        let uploadedImages = [];
-        let imageCaptions = [];
+  <!-- STEP 3 — CONFIDENCE -->
+  <div class="form-section">
+    <div class="form-section-title"><span class="num">3</span> Confidence Rating</div>
+    <label>How confident do you feel with this skill?</label>
+    <div class="confidence-grid">
+      <label class="confidence-option"><input type="radio" name="confidence" value="1"><span>1 — Just starting</span></label>
+      <label class="confidence-option"><input type="radio" name="confidence" value="2"><span>2 — Getting there</span></label>
+      <label class="confidence-option"><input type="radio" name="confidence" value="3"><span>3 — Confident</span></label>
+      <label class="confidence-option"><input type="radio" name="confidence" value="4"><span>4 — Could teach others</span></label>
+    </div>
+  </div>
 
-        // Colour palette matching main learning resource
-        const colors = {
-            primary: [196, 92, 74],       // #c45c4a - terracotta
-            primaryDark: [168, 74, 58],   // #a84a3a
-            secondary: [138, 122, 156],   // #8a7a9c - purple
-            tertiary: [126, 203, 196],    // #7ecbc4 - teal
-            tertiaryDark: [90, 154, 148], // #5a9a94
-            background: [245, 245, 220],  // #f5f5dc - beige
-            textDark: [74, 58, 54],       // #4a3a36
-            white: [255, 255, 255],
-            lightGray: [240, 240, 240],
-            gray: [150, 150, 150]
-        };
+  <!-- STEP 4 — REFLECTIONS -->
+  <div class="form-section">
+    <div class="form-section-title"><span class="num">4</span> Reflection Questions</div>
+    <div class="reflection-item">
+      <label><span class="q-num">1</span> What techniques did you practise?</label>
+      <textarea id="q1" placeholder="Name the specific tools or skills you used…"></textarea>
+    </div>
+    <div class="reflection-item">
+      <label><span class="q-num">2</span> What challenges did you face — and how did you solve them?</label>
+      <textarea id="q2" placeholder="Where did you get stuck? How did you work through it?"></textarea>
+    </div>
+    <div class="reflection-item">
+      <label><span class="q-num">3</span> What worked well?</label>
+      <textarea id="q3" placeholder="Which part of your outcome are you most satisfied with?"></textarea>
+    </div>
+    <div class="reflection-item" style="margin-bottom:0;">
+      <label><span class="q-num">4</span> What will you do differently next time?</label>
+      <textarea id="q4" placeholder="One thing you would change or develop further…"></textarea>
+    </div>
+  </div>
 
-        // Handle file upload
-        document.getElementById('screenshot-upload').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const container = document.getElementById('screenshots-container');
-                    const grid = document.getElementById('screenshots-grid');
-                    
-                    container.classList.remove('hidden');
-                    
-                    const imageIndex = uploadedImages.length;
-                    uploadedImages.push(e.target.result);
-                    imageCaptions.push('');
-                    
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'relative group bg-white/70 p-3 rounded-lg border-2 border-tertiary';
-                    wrapper.setAttribute('data-index', imageIndex);
-                    wrapper.innerHTML = `
-                        <div class="relative">
-                            <img src="${e.target.result}" alt="Practice progress" class="rounded-lg w-full object-cover aspect-video border-2 border-secondary/50">
-                            <button onclick="removeImage(this, ${imageIndex})" class="absolute top-2 right-2 btn-primary text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                        <div class="mt-3">
-                            <label class="block text-dark text-xs font-bold mb-1">Caption for Screenshot ${imageIndex + 1}:</label>
-                            <input 
-                                type="text" 
-                                placeholder="Describe what this screenshot shows..."
-                                class="w-full p-2 text-sm border-2 border-secondary/50 rounded-lg bg-white/70 focus:border-primary outline-none"
-                                data-caption-index="${imageIndex}"
-                                onchange="updateCaption(${imageIndex}, this.value)"
-                            />
-                        </div>
-                    `;
-                    
-                    grid.appendChild(wrapper);
-                    lucide.createIcons();
-                };
-                reader.readAsDataURL(file);
-            }
-            this.value = '';
-        });
+  <div class="diagonal-rule"></div>
 
-        // Update caption function
-        function updateCaption(index, value) {
-            imageCaptions[index] = value;
-        }
+  <!-- DOWNLOAD -->
+  <button class="download-btn" onclick="generatePDF()">
+    ⬇ Download Progress Report (PDF)
+  </button>
 
-        // Remove image function
-        function removeImage(button, index) {
-            uploadedImages[index] = null;
-            imageCaptions[index] = null;
-            button.closest('[data-index]').remove();
-            
-            const remainingImages = uploadedImages.filter(img => img !== null);
-            if (remainingImages.length === 0) {
-                document.getElementById('screenshots-container').classList.add('hidden');
-            }
-        }
+  <div class="padlet-box">
+    <p>📤 Remember to upload your PDF to Padlet</p>
+    <span>Your PDF includes all images, captions, and reflections</span>
+  </div>
 
-        // Generate PDF function
-        async function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            
-            document.getElementById('loading-overlay').classList.remove('hidden');
-            
-            try {
-                // Get form data
-                const studentName = document.getElementById('student-name').value || 'Student';
-                const notesTechniques = document.getElementById('notes-techniques').value || '';
-                const notesChallenges = document.getElementById('notes-challenges').value || '';
-                const notesWorked = document.getElementById('notes-worked').value || '';
-                const notesNext = document.getElementById('notes-next').value || '';
-                
-                const confidenceInput = document.querySelector('input[name="confidence"]:checked');
-                const confidence = confidenceInput ? confidenceInput.value : null;
-                const confidenceLabels = {
-                    '1': 'Just starting',
-                    '2': 'Getting there', 
-                    '3': 'Confident',
-                    '4': 'Could teach others'
-                };
-                
-                const activeImages = [];
-                const activeCaptions = [];
-                uploadedImages.forEach((img, idx) => {
-                    if (img !== null) {
-                        activeImages.push(img);
-                        activeCaptions.push(imageCaptions[idx] || '');
-                    }
-                });
-                
-                // Create PDF (A4 size)
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                const margin = 15;
-                const contentWidth = pageWidth - (margin * 2);
-                let yPosition = margin;
-                
-                // Helper function to check and add new page
-                function checkNewPage(requiredHeight) {
-                    if (yPosition + requiredHeight > pageHeight - margin - 15) {
-                        pdf.addPage();
-                        yPosition = margin;
-                        return true;
-                    }
-                    return false;
-                }
-                
-                // ========== PAGE HEADER ==========
-                pdf.setFillColor(...colors.primary);
-                pdf.rect(0, 0, pageWidth, 40, 'F');
-                
-                // Title
-                pdf.setTextColor(...colors.white);
-                pdf.setFontSize(28);
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('Progress Report', pageWidth / 2, 20, { align: 'center' });
-                
-                // Subtitle
-                pdf.setFontSize(14);
-                pdf.setFont('helvetica', 'normal');
-                pdf.text('Practice Space - Task 1', pageWidth / 2, 32, { align: 'center' });
-                
-                yPosition = 50;
-                
-                // ========== STUDENT INFO BOX ==========
-                pdf.setFillColor(...colors.background);
-                pdf.setDrawColor(...colors.tertiary);
-                pdf.setLineWidth(0.5);
-                pdf.roundedRect(margin, yPosition, contentWidth, 28, 3, 3, 'FD');
-                
-                // Student name
-                pdf.setTextColor(...colors.primary);
-                pdf.setFontSize(11);
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('Student:', margin + 5, yPosition + 8);
-                pdf.setFont('helvetica', 'normal');
-                pdf.setTextColor(...colors.textDark);
-                pdf.text(studentName, margin + 28, yPosition + 8);
-                
-                // Date
-                pdf.setTextColor(...colors.primary);
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('Date:', margin + 5, yPosition + 16);
-                pdf.setFont('helvetica', 'normal');
-                pdf.setTextColor(...colors.textDark);
-                pdf.text(new Date().toLocaleDateString('en-GB', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                }), margin + 18, yPosition + 16);
-                
-                // Confidence level
-                pdf.setTextColor(...colors.primary);
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('Confidence:', margin + 5, yPosition + 24);
-                pdf.setFont('helvetica', 'normal');
-                pdf.setTextColor(...colors.textDark);
-                pdf.text(confidence ? confidenceLabels[confidence] : 'Not rated', margin + 35, yPosition + 24);
-                
-                // Confidence visual indicator
-                if (confidence) {
-                    const indicatorX = margin + 80;
-                    const indicatorY = yPosition + 21;
-                    for (let i = 1; i <= 4; i++) {
-                        if (i <= parseInt(confidence)) {
-                            pdf.setFillColor(...colors.primary);
-                        } else {
-                            pdf.setFillColor(...colors.lightGray);
-                        }
-                        pdf.circle(indicatorX + (i * 8), indicatorY, 3, 'F');
-                    }
-                }
-                
-                yPosition += 38;
-                
-                // ========== COMPLETION PROGRESS BAR ==========
-                let completion = 0;
-                if (studentName && studentName !== 'Student') completion += 20;
-                if (activeImages.length > 0) completion += 20;
-                if (notesTechniques) completion += 15;
-                if (notesChallenges) completion += 15;
-                if (notesWorked) completion += 15;
-                if (notesNext) completion += 15;
-                
-                pdf.setFillColor(...colors.lightGray);
-                pdf.roundedRect(margin, yPosition, contentWidth, 6, 2, 2, 'F');
-                
-                if (completion > 0) {
-                    pdf.setFillColor(...colors.tertiary);
-                    pdf.roundedRect(margin, yPosition, contentWidth * (completion / 100), 6, 2, 2, 'F');
-                }
-                
-                pdf.setTextColor(...colors.gray);
-                pdf.setFontSize(9);
-                pdf.text(`Documentation Completion: ${completion}%`, margin, yPosition + 12);
-                
-                yPosition += 20;
-                
-                // ========== PROGRESS SCREENSHOTS SECTION ==========
-                if (activeImages.length > 0) {
-                    pdf.setTextColor(...colors.primary);
-                    pdf.setFontSize(16);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.text('Progress Screenshots', margin, yPosition);
-                    
-                    // Decorative line
-                    pdf.setDrawColor(...colors.tertiary);
-                    pdf.setLineWidth(1);
-                    pdf.line(margin, yPosition + 3, margin + 60, yPosition + 3);
-                    
-                    yPosition += 12;
-                    
-                    for (let i = 0; i < activeImages.length; i++) {
-                        const imgData = activeImages[i];
-                        const caption = activeCaptions[i];
-                        
-                        const img = new Image();
-                        img.src = imgData;
-                        
-                        await new Promise((resolve) => {
-                            img.onload = resolve;
-                        });
-                        
-                        const aspectRatio = img.width / img.height;
-                        let imgWidth = contentWidth - 10;
-                        let imgHeight = imgWidth / aspectRatio;
-                        
-                        // Allow larger images - up to 130mm height
-                        const maxHeight = 130;
-                        if (imgHeight > maxHeight) {
-                            imgHeight = maxHeight;
-                            imgWidth = imgHeight * aspectRatio;
-                        }
-                        
-                        // Calculate space needed (image + caption + padding)
-                        const captionHeight = caption ? 15 : 0;
-                        const totalNeeded = imgHeight + captionHeight + 25;
-                        
-                        // Start new page if needed
-                        if (yPosition + totalNeeded > pageHeight - margin - 15) {
-                            pdf.addPage();
-                            yPosition = margin;
-                        }
-                        
-                        // Screenshot label
-                        pdf.setFillColor(...colors.secondary);
-                        pdf.roundedRect(margin, yPosition, 30, 7, 2, 2, 'F');
-                        pdf.setTextColor(...colors.white);
-                        pdf.setFontSize(9);
-                        pdf.setFont('helvetica', 'bold');
-                        pdf.text(`Image ${i + 1}`, margin + 3, yPosition + 5);
-                        
-                        yPosition += 12;
-                        
-                        // Center the image
-                        const xOffset = (contentWidth - imgWidth) / 2;
-                        
-                        // Image container with border
-                        pdf.setFillColor(...colors.background);
-                        pdf.setDrawColor(...colors.tertiary);
-                        pdf.setLineWidth(1);
-                        pdf.roundedRect(margin + xOffset - 3, yPosition - 3, imgWidth + 6, imgHeight + 6, 3, 3, 'FD');
-                        
-                        // Add image
-                        pdf.addImage(imgData, 'JPEG', margin + xOffset, yPosition, imgWidth, imgHeight);
-                        
-                        yPosition += imgHeight + 8;
-                        
-                        // Add caption if provided
-                        if (caption) {
-                            pdf.setFillColor(...colors.background);
-                            pdf.setDrawColor(...colors.secondary);
-                            pdf.setLineWidth(0.5);
-                            
-                            const captionLines = pdf.splitTextToSize(caption, contentWidth - 20);
-                            const captionBoxHeight = (captionLines.length * 5) + 8;
-                            
-                            pdf.roundedRect(margin + 5, yPosition, contentWidth - 10, captionBoxHeight, 2, 2, 'FD');
-                            
-                            pdf.setTextColor(...colors.textDark);
-                            pdf.setFontSize(10);
-                            pdf.setFont('helvetica', 'italic');
-                            
-                            let captionY = yPosition + 6;
-                            captionLines.forEach(line => {
-                                pdf.text(line, margin + 10, captionY);
-                                captionY += 5;
-                            });
-                            
-                            yPosition += captionBoxHeight + 10;
-                        } else {
-                            yPosition += 10;
-                        }
-                    }
-                    
-                    yPosition += 5;
-                }
-                
-                // ========== REFLECTION SECTIONS ==========
-                const reflectionSections = [
-                    { title: 'Techniques Practiced', content: notesTechniques, number: '1' },
-                    { title: 'Challenges & Solutions', content: notesChallenges, number: '2' },
-                    { title: 'What Worked Well', content: notesWorked, number: '3' },
-                    { title: 'Next Steps', content: notesNext, number: '4' }
-                ];
-                
-                // Section header
-                checkNewPage(30);
-                
-                pdf.setTextColor(...colors.primary);
-                pdf.setFontSize(16);
-                pdf.setFont('helvetica', 'bold');
-                pdf.text('Reflections', margin, yPosition);
-                
-                // Decorative line
-                pdf.setDrawColor(...colors.tertiary);
-                pdf.setLineWidth(1);
-                pdf.line(margin, yPosition + 3, margin + 35, yPosition + 3);
-                
-                yPosition += 12;
-                
-                reflectionSections.forEach((section) => {
-                    const content = section.content || 'No response provided';
-                    const contentLines = pdf.splitTextToSize(content, contentWidth - 25);
-                    const boxHeight = Math.max(25, (contentLines.length * 5) + 18);
-                    
-                    checkNewPage(boxHeight + 10);
-                    
-                    // Section box
-                    pdf.setFillColor(...colors.background);
-                    pdf.setDrawColor(...colors.tertiary);
-                    pdf.setLineWidth(0.5);
-                    pdf.roundedRect(margin, yPosition, contentWidth, boxHeight, 3, 3, 'FD');
-                    
-                    // Number badge
-                    pdf.setFillColor(...colors.primary);
-                    pdf.circle(margin + 8, yPosition + 8, 5, 'F');
-                    pdf.setTextColor(...colors.white);
-                    pdf.setFontSize(10);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.text(section.number, margin + 6, yPosition + 10);
-                    
-                    // Section title
-                    pdf.setTextColor(...colors.primary);
-                    pdf.setFontSize(11);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.text(section.title, margin + 18, yPosition + 10);
-                    
-                    // Section content
-                    pdf.setTextColor(...colors.textDark);
-                    pdf.setFontSize(10);
-                    pdf.setFont('helvetica', 'normal');
-                    
-                    let contentY = yPosition + 18;
-                    contentLines.forEach(line => {
-                        if (contentY < yPosition + boxHeight - 3) {
-                            pdf.text(line, margin + 8, contentY);
-                            contentY += 5;
-                        }
-                    });
-                    
-                    yPosition += boxHeight + 8;
-                });
-                
-                // ========== FOOTER ON ALL PAGES ==========
-                const totalPages = pdf.internal.getNumberOfPages();
-                for (let i = 1; i <= totalPages; i++) {
-                    pdf.setPage(i);
-                    
-                    // Footer bar
-                    pdf.setFillColor(...colors.primary);
-                    pdf.rect(0, pageHeight - 12, pageWidth, 12, 'F');
-                    
-                    // Page number
-                    pdf.setTextColor(...colors.white);
-                    pdf.setFontSize(9);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.text(`Page ${i} of ${totalPages}`, pageWidth / 2, pageHeight - 4, { align: 'center' });
-                    
-                    // Student name in footer
-                    pdf.setFontSize(8);
-                    pdf.text(studentName, margin, pageHeight - 4);
-                    
-                    // Date in footer
-                    pdf.text(new Date().toLocaleDateString('en-GB'), pageWidth - margin, pageHeight - 4, { align: 'right' });
-                }
-                
-                // Save the PDF
-                const fileName = `Progress_Report_${studentName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
-                pdf.save(fileName);
-                
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-                alert('There was an error generating your PDF. Please try again.');
-            } finally {
-                document.getElementById('loading-overlay').classList.add('hidden');
-            }
-        }
-    </script>
+  <footer>© 2025 IELS Level 5 · Progress Documentation Tool</footer>
+
+</div>
+
+<script>
+// Image stores
+let beforeData = null, afterData = null;
+let extraImages = []; // {data, caption}
+
+function handleBeforeAfter(type, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    if (type === 'before') {
+      beforeData = e.target.result;
+      document.getElementById('before-preview').src = e.target.result;
+      document.getElementById('before-preview').style.display = 'block';
+      document.getElementById('before-placeholder').style.display = 'none';
+    } else {
+      afterData = e.target.result;
+      document.getElementById('after-preview').src = e.target.result;
+      document.getElementById('after-preview').style.display = 'block';
+      document.getElementById('after-placeholder').style.display = 'none';
+    }
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function handleExtra(input) {
+  const files = Array.from(input.files);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const idx = extraImages.length;
+      extraImages.push({ data: e.target.result, caption: '' });
+      const container = document.getElementById('extra-images');
+      const row = document.createElement('div');
+      row.className = 'additional-img-row';
+      row.setAttribute('data-idx', idx);
+      row.innerHTML = `
+        <div>
+          <img src="${e.target.result}" alt="Extra image">
+          <input type="text" placeholder="Caption (optional)" style="margin-top:6px;" oninput="extraImages[${idx}].caption=this.value">
+        </div>
+        <button class="remove-btn" onclick="removeExtra(this, ${idx})">Remove</button>
+      `;
+      container.appendChild(row);
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function removeExtra(btn, idx) {
+  extraImages[idx] = null;
+  btn.closest('.additional-img-row').remove();
+}
+
+// PDF GENERATION
+async function generatePDF() {
+  const { jsPDF } = window.jspdf;
+  document.getElementById('loading-overlay').classList.add('visible');
+
+  try {
+    const name = document.getElementById('student-name').value.trim() || 'Student';
+    const beforeCaption = document.getElementById('before-caption').value.trim();
+    const afterCaption  = document.getElementById('after-caption').value.trim();
+    const q1 = document.getElementById('q1').value.trim() || 'Not completed';
+    const q2 = document.getElementById('q2').value.trim() || 'Not completed';
+    const q3 = document.getElementById('q3').value.trim() || 'Not completed';
+    const q4 = document.getElementById('q4').value.trim() || 'Not completed';
+    const confEl = document.querySelector('input[name="confidence"]:checked');
+    const confLabels = { '1':'Just starting','2':'Getting there','3':'Confident','4':'Could teach others' };
+    const conf = confEl ? confLabels[confEl.value] : 'Not rated';
+
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const W = pdf.internal.pageSize.getWidth();
+    const H = pdf.internal.pageSize.getHeight();
+    const M = 14;
+    const CW = W - M * 2;
+    let y = M;
+
+    const teal  = [10, 122, 122];
+    const pink  = [234, 55, 163];
+    const ink   = [26, 26, 26];
+    const paper = [242, 237, 232];
+    const mid   = [212, 207, 200];
+    const grey  = [138, 138, 138];
+    const white = [255, 255, 255];
+    const gold  = [200, 121, 0];
+
+    function newPage() { pdf.addPage(); y = M; }
+    function checkY(h) { if (y + h > H - M - 10) newPage(); }
+
+    function hline(col) {
+      pdf.setDrawColor(...col);
+      pdf.setLineWidth(0.4);
+      pdf.line(M, y, W - M, y);
+      y += 4;
+    }
+
+    function sectionHead(label, col) {
+      checkY(12);
+      pdf.setFillColor(...col);
+      pdf.rect(M, y, 5, 9, 'F');
+      pdf.setTextColor(...col);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(10);
+      pdf.text(label, M + 8, y + 6.5);
+      y += 13;
+    }
+
+    function fieldBlock(labelStr, value, col) {
+      const lines = pdf.splitTextToSize(value || '—', CW - 10);
+      const bh = lines.length * 5 + 12;
+      checkY(bh + 6);
+      pdf.setFillColor(...paper);
+      pdf.setDrawColor(...col);
+      pdf.setLineWidth(0.4);
+      pdf.rect(M, y, CW, bh, 'FD');
+      pdf.setFillColor(...col);
+      pdf.rect(M, y, 3, bh, 'F');
+      pdf.setTextColor(...col);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(8);
+      pdf.text(labelStr.toUpperCase(), M + 6, y + 7);
+      pdf.setTextColor(...ink);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      let ty = y + 14;
+      lines.forEach(l => { pdf.text(l, M + 6, ty); ty += 5; });
+      y += bh + 5;
+    }
+
+    async function addImage(imgData, label, caption, col, fullWidth) {
+      if (!imgData) return;
+      const img = new Image();
+      img.src = imgData;
+      await new Promise(r => { img.onload = r; });
+      const aspect = img.width / img.height;
+      const iw = fullWidth ? CW : CW;
+      let ih = iw / aspect;
+      if (ih > 120) { ih = 120; }
+      checkY(ih + 30);
+      // Label badge
+      pdf.setFillColor(...col);
+      pdf.rect(M, y, 28, 7, 'F');
+      pdf.setTextColor(...white);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(8);
+      pdf.text(label, M + 3, y + 5);
+      y += 10;
+      // Image border
+      pdf.setDrawColor(...col);
+      pdf.setLineWidth(1);
+      pdf.rect(M, y, iw, ih);
+      pdf.addImage(imgData, 'JPEG', M, y, iw, ih);
+      y += ih + 4;
+      // Caption
+      if (caption) {
+        pdf.setFillColor(...paper);
+        pdf.setDrawColor(...mid);
+        pdf.setLineWidth(0.3);
+        const cl = pdf.splitTextToSize(caption, CW - 8);
+        const ch = cl.length * 4.5 + 6;
+        pdf.rect(M, y, CW, ch, 'FD');
+        pdf.setTextColor(...grey);
+        pdf.setFont('helvetica', 'italic');
+        pdf.setFontSize(9);
+        let cy = y + 5;
+        cl.forEach(l => { pdf.text(l, M + 4, cy); cy += 4.5; });
+        y += ch + 4;
+      }
+      y += 4;
+    }
+
+    // ─── HEADER ───
+    pdf.setFillColor(...ink);
+    pdf.rect(0, 0, W, 36, 'F');
+    pdf.setFillColor(...teal);
+    pdf.rect(0, 33, W, 3, 'F');
+    pdf.setTextColor(...white);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(20);
+    pdf.text('Progress Report', W / 2, 18, { align: 'center' });
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(10);
+    pdf.setTextColor(200, 200, 200);
+    pdf.text('IELS Level 5 · Progress Documentation', W / 2, 28, { align: 'center' });
+    y = 46;
+
+    // ─── STUDENT INFO ───
+    pdf.setFillColor(...paper);
+    pdf.setDrawColor(...teal);
+    pdf.setLineWidth(0.5);
+    pdf.rect(M, y, CW, 20, 'FD');
+    pdf.setFillColor(...teal);
+    pdf.rect(M, y, 3, 20, 'F');
+    pdf.setTextColor(...teal);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(9);
+    pdf.text('STUDENT', M + 6, y + 8);
+    pdf.text('DATE', M + 6, y + 16);
+    pdf.setTextColor(...ink);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(11);
+    pdf.text(name, M + 32, y + 8);
+    pdf.setFontSize(9);
+    pdf.text(new Date().toLocaleDateString('en-GB', { weekday:'long', year:'numeric', month:'long', day:'numeric' }), M + 32, y + 16);
+    // Confidence badge
+    pdf.setFillColor(...teal);
+    pdf.roundedRect(W - M - 52, y + 4, 52, 12, 2, 2, 'F');
+    pdf.setTextColor(...white);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(8);
+    pdf.text(conf, W - M - 26, y + 12, { align: 'center' });
+    y += 28;
+
+    // ─── BEFORE & AFTER ───
+    sectionHead('Before & After', teal);
+
+    if (beforeData || afterData) {
+      await addImage(beforeData, '⬅  BEFORE', beforeCaption, teal, true);
+      await addImage(afterData,  'AFTER  ➡', afterCaption,  pink, true);
+    } else {
+      pdf.setTextColor(...grey);
+      pdf.setFont('helvetica', 'italic');
+      pdf.setFontSize(10);
+      pdf.text('No images uploaded', M, y);
+      y += 8;
+    }
+
+    // ─── EXTRA IMAGES ───
+    const activeExtras = extraImages.filter(e => e !== null);
+    if (activeExtras.length > 0) {
+      sectionHead('Additional Images', [108, 53, 201]);
+      for (const ex of activeExtras) {
+        await addImage(ex.data, 'PROCESS', ex.caption, [108, 53, 201], true);
+      }
+    }
+
+    hline(mid);
+
+    // ─── REFLECTIONS ───
+    sectionHead('Reflections', pink);
+    fieldBlock('1. Techniques practised', q1, teal);
+    fieldBlock('2. Challenges & solutions', q2, pink);
+    fieldBlock('3. What worked well', q3, [108, 53, 201]);
+    fieldBlock('4. Next time', q4, gold);
+
+    // ─── FOOTER ALL PAGES ───
+    const total = pdf.internal.getNumberOfPages();
+    for (let i = 1; i <= total; i++) {
+      pdf.setPage(i);
+      pdf.setFillColor(...ink);
+      pdf.rect(0, H - 10, W, 10, 'F');
+      pdf.setTextColor(...white);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(8);
+      pdf.text(name, M, H - 3);
+      pdf.text(`Page ${i} of ${total}`, W / 2, H - 3, { align: 'center' });
+      pdf.text(new Date().toLocaleDateString('en-GB'), W - M, H - 3, { align: 'right' });
+    }
+
+    const fname = `Progress_Report_${name.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+    pdf.save(fname);
+
+  } catch (err) {
+    console.error(err);
+    alert('Error generating PDF — please try again.');
+  } finally {
+    document.getElementById('loading-overlay').classList.remove('visible');
+  }
+}
+</script>
 </body>
 </html>
