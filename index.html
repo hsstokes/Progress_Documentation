@@ -5,6 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Progress Documentation</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBDvRm8XCAvE6u1akzbPHsRGx40L643LYQ",
+    authDomain: "student-progress-tracker-a307d.firebaseapp.com",
+    projectId: "student-progress-tracker-a307d",
+    storageBucket: "student-progress-tracker-a307d.firebasestorage.app",
+    messagingSenderId: "146722116949",
+    appId: "1:146722116949:web:f4c8394081e19ab7fb4bdc"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  window.db = db;
+  window.addDoc = addDoc;
+  window.collection = collection;
+</script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500&display=swap');
 
@@ -826,7 +847,26 @@ async function generatePDF() {
     }
 
     const fname = `Progress_Report_${name.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`;
-    pdf.save(fname);
+pdf.save(fname);
+
+// Save to Firebase
+if (window.db) {
+  try {
+    await window.addDoc(window.collection(window.db, 'submissions'), {
+      name: name,
+      date: new Date().toISOString(),
+      confidence: conf,
+      techniques: q1,
+      challenges: q2,
+      whatWorked: q3,
+      nextTime: q4,
+      submitted: true
+    });
+    console.log('Saved to Firebase');
+  } catch(e) {
+    console.error('Firebase save failed:', e);
+  }
+}
 
   } catch (err) {
     console.error(err);
