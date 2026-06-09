@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Progress Dashboard</title>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBDvRm8XCAvE6u1akzbPHsRGx40L643LYQ",
+    authDomain: "student-progress-tracker-a307d.firebaseapp.com",
+    projectId: "student-progress-tracker-a307d",
+    storageBucket: "student-progress-tracker-a307d.firebasestorage.app",
+    messagingSenderId: "146722116949",
+    appId: "1:146722116949:web:f4c8394081e19ab7fb4bdc"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  async function loadSubmissions() {
+    try {
+      const q = query(collection(db, 'submissions'), orderBy('date', 'desc'));
+      const snapshot = await getDocs(q);
+      const submissions = [];
+      snapshot.forEach(doc => submissions.push({ id: doc.id, ...doc.data() }));
+      window.allSubmissions = submissions;
+      renderDashboard(submissions);
+      updateStats(submissions);
+    } catch(e) {
+      document.getElementById('loading-state').innerHTML = '<p style="color:var(--pink)">Error loading data. Check Firebase connection.</p>';
+      console.error(e);
+    }
+  }
+
+  window.loadSubmissions = loadSubmissions;
+
+  document.addEventListener('DOMContentLoaded', loadSubmissions);
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@300;400;500&display=swap');
+
+:root {
+  --ink: #1a1a1a; --paper: #f2ede8; --teal: #0a7a7a; --teal-light: #e0f0f0;
+  --pink: #ea37a3; --pink-light: #fdf1f5; --purple: #6c35c9;
+  --gold: #c87900; --gold-light: #fff8e6; --warm-mid: #d4cfc8;
+  --grid: #ddd8d2; --concrete: #8a8a8a; --white: #ffffff;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'IBM Plex Mono', monospace;
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+  color: var(--ink); font-size: 14px; line-height: 1.7;
+  min-height: 100vh;
+}
+
+.container { max-width: 1100px; margin: 0 auto; padding: 36px 28px 60px; }
+
+/* HEADER */
+.site-header {
+  display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 16px;
+  border-bottom: 3px solid var(--ink); padding-bottom: 18px; margin-bottom: 28px;
+}
+.header-eyebrow { font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--teal); margin-bottom: 6px; }
+.site-header h1 { font-family: 'DM Serif Display', serif; font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 400; line-height: 1.1; }
+.site-header h1 em { color: var(--teal); font-style: italic; }
+.refresh-btn {
+  background: var(--teal); color: white; border: none; padding: 10px 18px;
+  border-radius: 3px; font-family: 'Space Mono', monospace; font-size: 0.72rem;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.refresh-btn:hover { background: var(--ink); }
+
+/* STATS ROW */
+.stats-row {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px;
+}
+@media (max-width: 700px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+
+.stat-card {
+  background: white; border: 2px solid var(--warm-mid); border-radius: 4px;
+  padding: 16px; text-align: center;
+}
+.stat-card .stat-num {
+  font-family: 'DM Serif Display', serif; font-size: 2.2rem; font-weight: 400;
+  line-height: 1; margin-bottom: 4px;
+}
+.stat-card .stat-label { font-family: 'Space Mono', monospace; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--concrete); }
+.stat-card.teal { border-color: var(--teal); }
+.stat-card.teal .stat-num { color: var(--teal); }
+.stat-card.pink { border-color: var(--pink); }
+.stat-card.pink .stat-num { color: var(--pink); }
+.stat-card.purple { border-color: var(--purple); }
+.stat-card.purple .stat-num { color: var(--purple); }
+.stat-card.gold { border-color: var(--gold); }
+.stat-card.gold .stat-num { color: var(--gold); }
+
+/* FILTERS */
+.filters {
+  display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
+}
+.filter-label { font-family: 'Space Mono', monospace; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--concrete); }
+.filter-btn {
+  background: white; border: 2px solid var(--warm-mid); border-radius: 3px;
+  padding: 6px 14px; font-family: 'Space Mono', monospace; font-size: 0.7rem;
+  font-weight: 700; cursor: pointer; transition: all 0.2s; color: var(--ink);
+}
+.filter-btn:hover { border-color: var(--teal); color: var(--teal); }
+.filter-btn.active { background: var(--teal); border-color: var(--teal); color: white; }
+
+/* TABLE */
+.table-wrap { background: white; border: 2px solid var(--warm-mid); border-radius: 4px; overflow: hidden; overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; min-width: 700px; }
+
+thead tr { background: var(--ink); }
+thead th {
+  padding: 10px 14px; text-align: left;
+  font-family: 'Space Mono', monospace; font-size: 0.65rem;
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+  color: white; white-space: nowrap;
+}
+
+tbody tr { border-bottom: 1px solid var(--warm-mid); transition: background 0.15s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--paper); }
+
+tbody td {
+  padding: 10px 14px; font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem; vertical-align: middle;
+}
+
+.td-name { font-weight: 700; color: var(--ink); }
+.td-group {
+  font-family: 'Space Mono', monospace; font-size: 0.68rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 2px; background: var(--teal-light);
+  color: var(--teal); display: inline-block; white-space: nowrap;
+}
+.td-date { color: var(--concrete); font-size: 0.75rem; white-space: nowrap; }
+
+.conf-badge {
+  font-family: 'Space Mono', monospace; font-size: 0.65rem; font-weight: 700;
+  padding: 3px 8px; border-radius: 2px; white-space: nowrap; display: inline-block;
+}
+.conf-1 { background: var(--pink-light); color: var(--pink); }
+.conf-2 { background: var(--gold-light); color: var(--gold); }
+.conf-3 { background: var(--teal-light); color: var(--teal); }
+.conf-4 { background: #e8f5e9; color: #2e7d32; }
+
+.img-status { display: flex; gap: 4px; }
+.img-dot {
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; font-weight: 700; flex-shrink: 0;
+}
+.img-dot.done { background: var(--teal-light); color: var(--teal); }
+.img-dot.missing { background: var(--pink-light); color: var(--pink); }
+
+.reflection-cell { max-width: 220px; }
+.reflection-preview {
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-size: 0.75rem; color: var(--concrete); max-width: 220px;
+  cursor: pointer;
+}
+.reflection-preview:hover { color: var(--teal); }
+
+/* EMPTY / LOADING */
+#loading-state { padding: 40px; text-align: center; color: var(--concrete); font-family: 'Space Mono', monospace; font-size: 0.8rem; }
+
+.empty-row td { text-align: center; padding: 40px; color: var(--concrete); font-family: 'Space Mono', monospace; font-size: 0.8rem; }
+
+/* DETAIL PANEL */
+#detail-panel {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+}
+#detail-panel.visible { display: flex; }
+.detail-box {
+  background: white; border: 2px solid var(--warm-mid); border-radius: 6px;
+  max-width: 560px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 28px;
+}
+.detail-box h3 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; font-weight: 400; color: var(--teal); margin-bottom: 4px; }
+.detail-meta { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--concrete); margin-bottom: 20px; }
+.detail-q { margin-bottom: 14px; }
+.detail-q-label { font-family: 'Space Mono', monospace; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; color: var(--teal); margin-bottom: 4px; }
+.detail-q-text { font-size: 0.84rem; color: var(--ink); line-height: 1.6; }
+.detail-close {
+  background: var(--ink); color: white; border: none; padding: 10px 20px;
+  border-radius: 3px; font-family: 'Space Mono', monospace; font-size: 0.72rem;
+  font-weight: 700; text-transform: uppercase; cursor: pointer; margin-top: 16px;
+  transition: background 0.2s;
+}
+.detail-close:hover { background: var(--teal); }
+
+footer { text-align: center; padding: 20px 0 0; border-top: 1px dashed var(--warm-mid); margin-top: 32px; font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--concrete); }
+</style>
+</head>
+<body>
+
+<div id="detail-panel">
+  <div class="detail-box">
+    <h3 id="detail-name"></h3>
+    <div class="detail-meta" id="detail-meta"></div>
+    <div class="detail-q">
+      <div class="detail-q-label">Techniques practised</div>
+      <div class="detail-q-text" id="detail-q1"></div>
+    </div>
+    <div class="detail-q">
+      <div class="detail-q-label">Challenges & solutions</div>
+      <div class="detail-q-text" id="detail-q2"></div>
+    </div>
+    <div class="detail-q">
+      <div class="detail-q-label">What worked well</div>
+      <div class="detail-q-text" id="detail-q3"></div>
+    </div>
+    <div class="detail-q">
+      <div class="detail-q-label">Next time</div>
+      <div class="detail-q-text" id="detail-q4"></div>
+    </div>
+    <button class="detail-close" onclick="closeDetail()">Close</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <header class="site-header">
+    <div>
+      <div class="header-eyebrow">IELS Level 5 · Teacher View</div>
+      <h1>Student Progress<br><em>Dashboard</em></h1>
+    </div>
+    <button class="refresh-btn" onclick="window.loadSubmissions()">↻ Refresh</button>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card teal">
+      <div class="stat-num" id="stat-total">—</div>
+      <div class="stat-label">Total Submissions</div>
+    </div>
+    <div class="stat-card pink">
+      <div class="stat-num" id="stat-students">—</div>
+      <div class="stat-label">Unique Students</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-num" id="stat-confident">—</div>
+      <div class="stat-label">Confident or above</div>
+    </div>
+    <div class="stat-card gold">
+      <div class="stat-num" id="stat-complete">—</div>
+      <div class="stat-label">All images uploaded</div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters">
+    <span class="filter-label">Filter by group:</span>
+    <button class="filter-btn active" onclick="filterGroup('all', this)">All groups</button>
+    <button class="filter-btn" onclick="filterGroup('D1/D2', this)">D1 / D2</button>
+    <button class="filter-btn" onclick="filterGroup('D3/D4', this)">D3 / D4</button>
+    <button class="filter-btn" onclick="filterGroup('D5/D6', this)">D5 / D6</button>
+    <button class="filter-btn" onclick="filterGroup('D7/D8', this)">D7 / D8</button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <div id="loading-state">Loading submissions…</div>
+    <table id="submissions-table" style="display:none;">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Group</th>
+          <th>Date</th>
+          <th>Confidence</th>
+          <th>Task 1</th>
+          <th>Task 2</th>
+          <th>Reflection</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <footer>© 2025 IELS Level 5 · Progress Dashboard · Teacher view only</footer>
+
+</div>
+
+<script>
+let currentFilter = 'all';
+
+function renderDashboard(submissions) {
+  const loading = document.getElementById('loading-state');
+  const table = document.getElementById('submissions-table');
+  const tbody = document.getElementById('table-body');
+
+  loading.style.display = 'none';
+  table.style.display = 'table';
+  tbody.innerHTML = '';
+
+  const filtered = currentFilter === 'all'
+    ? submissions
+    : submissions.filter(s => s.group === currentFilter);
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No submissions found for this group.</td></tr>';
+    return;
+  }
+
+  const confClass = { 'Just starting': 'conf-1', 'Getting there': 'conf-2', 'Confident': 'conf-3', 'Could teach others': 'conf-4' };
+
+  filtered.forEach(sub => {
+    const date = sub.date ? new Date(sub.date).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—';
+    const conf = sub.confidence || '—';
+    const t1b = sub.task1?.before; const t1a = sub.task1?.after;
+    const t2b = sub.task2?.before; const t2a = sub.task2?.after;
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td class="td-name">${sub.name || '—'}</td>
+      <td><span class="td-group">${sub.group || '—'}</span></td>
+      <td class="td-date">${date}</td>
+      <td><span class="conf-badge ${confClass[conf] || ''}">${conf}</span></td>
+      <td>
+        <div class="img-status">
+          <div class="img-dot ${t1b ? 'done' : 'missing'}" title="Before">${t1b ? 'B' : '✕'}</div>
+          <div class="img-dot ${t1a ? 'done' : 'missing'}" title="After">${t1a ? 'A' : '✕'}</div>
+        </div>
+      </td>
+      <td>
+        <div class="img-status">
+          <div class="img-dot ${t2b ? 'done' : 'missing'}" title="Before">${t2b ? 'B' : '✕'}</div>
+          <div class="img-dot ${t2a ? 'done' : 'missing'}" title="After">${t2a ? 'A' : '✕'}</div>
+        </div>
+      </td>
+      <td class="reflection-cell">
+        <div class="reflection-preview" onclick='showDetail(${JSON.stringify(sub).replace(/'/g, "&#39;")})'>
+          ${sub.techniques || '—'}
+        </div>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function updateStats(submissions) {
+  document.getElementById('stat-total').textContent = submissions.length;
+  const unique = new Set(submissions.map(s => s.name)).size;
+  document.getElementById('stat-students').textContent = unique;
+  const confident = submissions.filter(s => s.confidence === 'Confident' || s.confidence === 'Could teach others').length;
+  document.getElementById('stat-confident').textContent = confident;
+  const complete = submissions.filter(s => s.task1?.before && s.task1?.after && s.task2?.before && s.task2?.after).length;
+  document.getElementById('stat-complete').textContent = complete;
+}
+
+function filterGroup(group, btn) {
+  currentFilter = group;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (window.allSubmissions) renderDashboard(window.allSubmissions);
+}
+
+function showDetail(sub) {
+  document.getElementById('detail-name').textContent = sub.name || '—';
+  document.getElementById('detail-meta').textContent = (sub.group || '—') + ' · ' + (sub.date ? new Date(sub.date).toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) : '—') + ' · ' + (sub.confidence || '—');
+  document.getElementById('detail-q1').textContent = sub.techniques || '—';
+  document.getElementById('detail-q2').textContent = sub.challenges || '—';
+  document.getElementById('detail-q3').textContent = sub.whatWorked || '—';
+  document.getElementById('detail-q4').textContent = sub.nextTime || '—';
+  document.getElementById('detail-panel').classList.add('visible');
+}
+
+function closeDetail() {
+  document.getElementById('detail-panel').classList.remove('visible');
+}
+</script>
+</body>
+</html>
