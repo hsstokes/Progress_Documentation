@@ -240,6 +240,10 @@ footer { text-align: center; padding: 20px 0 0; border-top: 1px dashed var(--war
     </div>
   </div>
 
+  <div class="error-box" id="error-images">
+    <strong>Please upload before and after images for both tasks before downloading.</strong>
+  </div>
+
   <!-- STEP 4 — CONFIDENCE -->
   <div class="form-section">
     <div class="form-section-title purple-title"><span class="num">4</span> Confidence Rating</div>
@@ -328,6 +332,20 @@ function checkAndShowCongrats() {
     if (!group) document.getElementById('student-group').classList.add('field-error');
     valid = false;
   }
+
+  // Validate images
+let imageMissing = false;
+const imageKeys = ['t1b','t1a','t2b','t2a'];
+imageKeys.forEach(key => {
+  if (!imgs[key]) imageMissing = true;
+});
+if (imageMissing) {
+  // show error
+  document.getElementById('error-images').classList.add('visible');
+  valid = false;
+} else {
+  document.getElementById('error-images').classList.remove('visible');
+}
 
   document.getElementById('error-reflection').classList.remove('visible');
   ['q1','q2','q3','q4'].forEach(id => document.getElementById(id).classList.remove('field-error'));
