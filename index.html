@@ -163,12 +163,12 @@ footer { text-align: center; padding: 20px 0 0; border-top: 1px dashed var(--war
     <div class="error-box" id="error-details"><strong>Please enter your full name and select your group.</strong></div>
   </div>
 
-  <!-- STEP 2 — TASK 1 -->
-  <div class="form-section">
-    <div class="form-section-title"><span class="num">2</span> Task 1 — Before &amp; After</div>
-    <div class="info-box" style="margin-bottom:14px;">
-      <strong>Show your progress on Task 1.</strong> Upload a before image and your finished outcome.
-    </div>
+    <!-- STEP 2 — BEFORE & AFTER -->
+    <div class="form-section">
+      <div class="form-section-title"><span class="num">2</span> Before &amp; After</div>
+      <div class="info-box" style="margin-bottom:14px;">
+        <strong>Show your progress today.</strong> Upload a before image and your finished outcome.
+      </div>
     <div class="before-after-grid">
       <div class="img-upload-slot">
         <div class="img-slot-header before">⬅ Before</div>
@@ -176,8 +176,6 @@ footer { text-align: center; padding: 20px 0 0; border-top: 1px dashed var(--war
           <div class="img-placeholder" id="t1b-ph" onclick="document.getElementById('t1b-up').click()">Click to upload<br>before image</div>
           <img id="t1b-pr" src="" alt="" style="display:none;">
           <input type="file" id="t1b-up" accept="image/*" style="display:none;" onchange="handleImg('t1b',this)">
-          <label style="margin-top:4px;">Caption</label>
-          <input type="text" id="t1b-cap" placeholder="Describe this image…">
         </div>
       </div>
       <div class="img-upload-slot">
@@ -186,50 +184,18 @@ footer { text-align: center; padding: 20px 0 0; border-top: 1px dashed var(--war
           <div class="img-placeholder pink-hover" id="t1a-ph" onclick="document.getElementById('t1a-up').click()">Click to upload<br>after image</div>
           <img id="t1a-pr" src="" alt="" style="display:none;">
           <input type="file" id="t1a-up" accept="image/*" style="display:none;" onchange="handleImg('t1a',this)">
-          <label style="margin-top:4px;">Caption</label>
-          <input type="text" id="t1a-cap" placeholder="Describe this image…">
-        </div>
       </div>
     </div>
   </div>
-
-  <!-- STEP 3 — TASK 2 -->
-  <div class="form-section">
-    <div class="form-section-title pink-title"><span class="num">3</span> Task 2 — Before &amp; After</div>
-    <div class="info-box" style="margin-bottom:14px;border-color:var(--pink);background:var(--pink-light);">
-      <strong style="color:var(--pink)">Show your progress on Task 2.</strong> Upload a before image and your finished outcome.
-    </div>
-    <div class="before-after-grid">
-      <div class="img-upload-slot">
-        <div class="img-slot-header before">⬅ Before</div>
-        <div class="img-slot-body">
-          <div class="img-placeholder" id="t2b-ph" onclick="document.getElementById('t2b-up').click()">Click to upload<br>before image</div>
-          <img id="t2b-pr" src="" alt="" style="display:none;">
-          <input type="file" id="t2b-up" accept="image/*" style="display:none;" onchange="handleImg('t2b',this)">
-          <label style="margin-top:4px;">Caption</label>
-          <input type="text" id="t2b-cap" placeholder="Describe this image…">
-        </div>
-      </div>
-      <div class="img-upload-slot">
-        <div class="img-slot-header after">After ➡</div>
-        <div class="img-slot-body">
-          <div class="img-placeholder pink-hover" id="t2a-ph" onclick="document.getElementById('t2a-up').click()">Click to upload<br>after image</div>
-          <img id="t2a-pr" src="" alt="" style="display:none;">
-          <input type="file" id="t2a-up" accept="image/*" style="display:none;" onchange="handleImg('t2a',this)">
-          <label style="margin-top:4px;">Caption</label>
-          <input type="text" id="t2a-cap" placeholder="Describe this image…">
-        </div>
-      </div>
-    </div>
-  </div>
+</div>
 
   <div class="error-box" id="error-images">
-    <strong>Please upload before and after images for both tasks before downloading.</strong>
+    <strong>Please upload a before and after image before downloading.</strong>
   </div>
 
-  <!-- STEP 4 — CONFIDENCE -->
+  <!-- STEP 3 — CONFIDENCE -->
   <div class="form-section">
-    <div class="form-section-title purple-title"><span class="num">4</span> Confidence Rating</div>
+    <div class="form-section-title purple-title"><span class="num">3</span> Confidence Rating</div>
     <label>How confident do you feel with today's skills?</label>
     <div class="confidence-grid">
       <label class="confidence-option"><input type="radio" name="confidence" value="1"><span>1 — Just starting</span></label>
@@ -239,9 +205,9 @@ footer { text-align: center; padding: 20px 0 0; border-top: 1px dashed var(--war
     </div>
   </div>
 
-  <!-- STEP 5 — REFLECTION (REQUIRED) -->
+  <!-- STEP 4 — REFLECTION (REQUIRED) -->
   <div class="form-section">
-    <div class="form-section-title gold-title"><span class="num">5</span> Reflection — Required</div>
+    <div class="form-section-title gold-title"><span class="num">4</span> Reflection — Required</div>
     <div class="notice" style="margin-bottom:16px;">
       <strong>All four questions must be answered</strong> before you can download your report.
     </div>
@@ -272,7 +238,7 @@ footer { text-align: center; padding: 20px 0 0; border-top: 1px dashed var(--war
 
   <div class="padlet-box">
     <p>📤 Remember to upload your PDF to Padlet</p>
-    <span>Your PDF includes all images, captions, and reflections</span>
+    <span>Your PDF includes all images and reflections</span>
   </div>
 
   <footer>© 2025 IELS Level 5 · Progress Documentation Tool</footer>
@@ -318,7 +284,7 @@ function checkAndShowCongrats() {
 
   // Validate images
 let imageMissing = false;
-const imageKeys = ['t1b','t1a','t2b','t2a'];
+const imageKeys = ['t1b','t1a'];
 imageKeys.forEach(key => {
   if (!imgs[key]) imageMissing = true;
 });
@@ -349,10 +315,8 @@ if (imageMissing) {
   const checklist = document.getElementById('congrats-checklist');
   checklist.innerHTML = '';
   const items = [
-    { label: 'Task 1 — Before image', done: !!imgs['t1b'] },
-    { label: 'Task 1 — After image', done: !!imgs['t1a'] },
-    { label: 'Task 2 — Before image', done: !!imgs['t2b'] },
-    { label: 'Task 2 — After image', done: !!imgs['t2a'] },
+    { label: 'Before image', done: !!imgs['t1b'] },
+    { label: 'After image', done: !!imgs['t1a'] },
     { label: 'Reflection completed', done: !!(q1 && q2 && q3 && q4) },
   ];
   items.forEach(item => {
@@ -380,10 +344,6 @@ async function generatePDF() {
     const q2 = document.getElementById('q2').value.trim();
     const q3 = document.getElementById('q3').value.trim();
     const q4 = document.getElementById('q4').value.trim();
-    const t1bc = document.getElementById('t1b-cap').value.trim();
-    const t1ac = document.getElementById('t1a-cap').value.trim();
-    const t2bc = document.getElementById('t2b-cap').value.trim();
-    const t2ac = document.getElementById('t2a-cap').value.trim();
     const confEl = document.querySelector('input[name="confidence"]:checked');
     const confLabels = {'1':'Just starting','2':'Getting there','3':'Confident','4':'Could teach others'};
     const conf = confEl ? confLabels[confEl.value] : 'Not rated';
@@ -463,25 +423,14 @@ async function generatePDF() {
     pdf.text(conf, W-M-26, y+15, {align:'center'});
     y+=34;
 
-    // TASK 1
-    sectionHead('Task 1 — Before & After', teal);
+    // BEFORE & AFTER
+       sectionHead('Before & After', teal);
     if (imgs['t1b']||imgs['t1a']) {
-      await addImg(imgs['t1b'],'⬅  BEFORE',t1bc,teal);
-      await addImg(imgs['t1a'],'AFTER  ➡',t1ac,teal);
+      await addImg(imgs['t1b'],'⬅  BEFORE','',teal);
+      await addImg(imgs['t1a'],'AFTER  ➡','',teal);
     } else {
       pdf.setTextColor(...grey); pdf.setFont('helvetica','italic'); pdf.setFontSize(10);
-      pdf.text('No images uploaded for Task 1', M, y); y+=8;
-    }
-    hline(mid);
-
-    // TASK 2
-    sectionHead('Task 2 — Before & After', pink);
-    if (imgs['t2b']||imgs['t2a']) {
-      await addImg(imgs['t2b'],'⬅  BEFORE',t2bc,pink);
-      await addImg(imgs['t2a'],'AFTER  ➡',t2ac,pink);
-    } else {
-      pdf.setTextColor(...grey); pdf.setFont('helvetica','italic'); pdf.setFontSize(10);
-      pdf.text('No images uploaded for Task 2', M, y); y+=8;
+      pdf.text('No images uploaded', M, y); y+=8;
     }
     hline(mid);
 
