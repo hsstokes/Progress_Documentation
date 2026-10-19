@@ -245,15 +245,34 @@ const imgs = {};
 function handleImg(key, input) {
   const file = input.files[0];
   if (!file) return;
+  input.value = '';
   const reader = new FileReader();
   reader.onload = e => {
-    imgs[key] = e.target.result;
-    document.getElementById(key + '-pr').src = e.target.result;
-    document.getElementById(key + '-pr').style.display = 'block';
-    document.getElementById(key + '-ph').style.display = 'none';
+    const img = new Image();
+    img.onload = () => {
+      /* Shrink big photos and save as JPEG — keeps the PDF small and fast */
+      const MAX = 1600;
+      const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * scale);
+      c.height = Math.round(img.height * scale);
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(img, 0, 0, c.width, c.height);
+      imgs[key] = c.toDataURL('image/jpeg', 0.85);
+      document.getElementById(key + '-pr').src = imgs[key];
+      document.getElementById(key + '-pr').style.display = 'block';
+      document.getElementById(key + '-ph').style.display = 'none';
+      document.getElementById('error-images').classList.remove('visible');
+    };
+    img.onerror = () => {
+      delete imgs[key];
+      alert('Sorry — this photo type does not work here (for example iPhone HEIC photos).\n\nPlease use a JPG or PNG, or take a screenshot of your work and upload that.');
+    };
+    img.src = e.target.result;
   };
+  reader.onerror = () => alert('Sorry — this file could not be read. Please try a JPG or PNG.');
   reader.readAsDataURL(file);
-  input.value = '';
 }
 
 function checkAndShowCongrats() {
@@ -375,8 +394,14 @@ async function generatePDF() {
 
     async function addImg(data, lbl, cap, col) {
       if (!data) return;
-      const img = new Image(); img.src = data;
-      await new Promise(r=>{img.onload=r;});
+      const img = new Image();
+      const ok = await new Promise(r => {
+        img.onload = () => r(true);
+        img.onerror = () => r(false);
+        setTimeout(() => r(false), 10000);
+        img.src = data;
+      });
+      if (!ok || !img.width) return;
       const aspect = img.width/img.height;
       let ih = CW/aspect; if(ih>110) ih=110;
       checkY(ih+30);
